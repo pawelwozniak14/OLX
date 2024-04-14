@@ -36,9 +36,11 @@ with st.sidebar.form(key="city_form"):
          "Poznań", "Rzeszów", "Szczecin", "Toruń", "Warszawa", "Wrocław",
          "Zielona Góra"],
         label_visibility="collapsed")
+    city_name = {'city_name': city}
+    
     submit_button = st.form_submit_button("Click here to confirm your choice", type="primary")
+    response = requests.post('http://backend:8000/preprocess/', json = city_name)
     st.write(city)
 
-city_name = {'city_name': city}
-response = requests.post('http://backend:8000/hello_world/', json = city_name)
-st.write(response.json())
+
+st.write(response)

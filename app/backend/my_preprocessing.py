@@ -81,7 +81,7 @@ def transform_build_year(data):
 def create_dummies(data):
     X1 = data.drop(["price", "m"], axis=1)
     X2 = data[["price", "m"]]
-    dummy1 = pd.get_dummies(X1["is_business"]).drop("0", axis=1).rename({"1": "is_business"}, axis=1)
+    dummy1 = pd.get_dummies(X1["is_business"]).drop(0, axis=1).rename({1: "is_business"}, axis=1)
     X1 = X1.drop("is_business", axis=1)
     dummy2 = pd.get_dummies(X1)
     data = pd.concat([X2, dummy1, dummy2], axis=1)

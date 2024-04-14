@@ -10,25 +10,28 @@ import matplotlib
 app = FastAPI()
 
 
-#df = pd.read_csv('data/train2.csv', dtype={"district_id": "Int64", "city_id": "Int64", "id": "Int64", "is_business": "string", "region_id": "Int64", "price": "Int64", "created_at_first": "str",
-#"params": "str"}, engine="python", encoding="utf-8")
-#districts = pd.read_csv("data/districts.csv", dtype={'id': 'Int64'})
-#cities = pd.read_csv("data/cities.csv", dtype={'id': 'Int64'})
+df = pd.read_csv("data/train4.csv")
+
 
 @app.get("/")
 async def read_root():
     return {"message": "Welcome to the model API!"}
 
 @app.post("/hello_world/")
-async def preprocess(city_name: dict):
+async def preprocess0(city_name: dict):
     return city_name
 
 
-#@app.post("/preprocess/")
-#async def preprocess(city_name: str):
-#    data = my_preprocessing.preprocess_data(df, cities, districts, city_name=city_name)
-#    X_train, X_val, y_train, y_val = my_preprocessing.data_split(data)
-#    return X_train, X_val, y_train, y_val
+@app.post("/preprocess/")
+async def preprocess(city_name: dict):
+    data = df.loc[df['city_name'] == city_name["city_name"]]
+    data = data.drop("Unnamed: 0", axis=1)
+    data = my_preprocessing.create_dummies(df)
+    X_train, X_val, y_train, y_val = my_preprocessing.data_split(data)
+    model = my_training.train_model(X_train, y_train)
+    rmse, mae = my_training.validate_model(model, X_val, y_val)
+    response = {"rmse": rmse, "mae": mae}
+    return response
 
 #@app.post("/train/")
 #async def train(X_train: pd.DataFrame, y_train: pd.DataFrame):

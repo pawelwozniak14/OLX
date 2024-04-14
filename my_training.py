@@ -41,9 +41,9 @@ def validate_model(model, X_val, y_val):
     predictions_bayesian_opt = model.predict(X_val)
     rmse = mean_squared_error(y_val, predictions_bayesian_opt, squared = False)
     mae = mean_absolute_error(y_true = y_val, y_pred = predictions_bayesian_opt)
-    print("RMSE for Bayesian Optimization: ", rmse)
-    print("MAE for Bayesian Optimization: ", mae)
-    return rmse, mae
+    actual = y_val
+    #pred = predictions_bayesian_opt
+    return rmse, mae, actual#, pred
 
 
 def xgb_cv_score(parameters):
