@@ -7,9 +7,16 @@ import pandas as pd
 
 class XGBoostModel:
     def __init__(self):
-        self.df = pd.read_csv("data/train4.csv")
+        self.df = pd.read_csv("data/train7.csv")
 
-    def xgb_cv_score(parameters):
+    def set_df(self, df):
+        self.df = df
+
+    def set_city(self, city_name: str):
+        self.city = city_name
+        self.df.loc[self.df['city_name'] == self.city]
+
+    def xgb_cv_score(self, parameters):
         parameters = parameters[0]
         score = -cross_val_score(
             	xgb.XGBRegressor(
@@ -19,14 +26,12 @@ class XGBoostModel:
                 	colsample_bytree=parameters[3],
                 	n_estimators=int(parameters[4]),
                 	learning_rate=parameters[5]),
-            	X_train, y_train, scoring='neg_mean_squared_error', cv=3).mean()
+            	self.X_train, self.y_train, scoring='neg_mean_squared_error', cv=3).mean()
         return score
 
-    def train_model(X, y):
-        global X_train
-        global y_train
-        X_train = X
-        y_train = y
+    def train_model(self, X, y):
+        self.X_train = X
+        self.y_train = y
         baysian_opt_bounds = [
 	        {'name': 'max_depth', 'type': 'discrete', 'domain': (3, 10, 5, 15)},
 	        {'name': 'min_child_weight', 'type': 'discrete', 'domain': (1, 5, 10)},
@@ -36,7 +41,7 @@ class XGBoostModel:
 	        {'name': 'learning_rate', 'type': 'continuous', 'domain': (0.01, 0.2)}
         ]
         optimizer = BayesianOptimization(
-	        f=xgb_cv_score, domain=baysian_opt_bounds, model_type='GP',
+	        f=self.xgb_cv_score, domain=baysian_opt_bounds, model_type='GP',
 	        acquisition_type='EI', max_iter=25
             )
         optimizer.run_optimization()
@@ -49,17 +54,16 @@ class XGBoostModel:
 	    'n_estimators': int(best_params_bayesian[4]),
 	    'learning_rate': best_params_bayesian[5]
         }
-    # Initialize and train the model
+        # Initialize and train the model
         model_bayesian_opt = xgb.XGBRegressor(**params_bayesian_opt)
-        model_bayesian_opt.fit(X_train, y_train)
-        return model_bayesian_opt
+        model_bayesian_opt.fit(self.X_train, self.y_train)
+        self.model = model_bayesian_opt
 
 
-    def validate_model(model, X_val, y_val):
-        predictions_bayesian_opt = model.predict(X_val)
-        rmse = mean_squared_error(y_val, predictions_bayesian_opt, squared = False)
-        mae = mean_absolute_error(y_true = y_val, y_pred = predictions_bayesian_opt)
-        return rmse, mae, predictions_bayesian_opt
+    def validate_model(self, X_val, y_val):
+        self.pred = self.model.predict(X_val)
+        self.rmse = mean_squared_error(y_val, self.pred, squared = False)
+        self.mae = mean_absolute_error(y_true = y_val, y_pred = self.pred)
 
-
-    
+    def predict_new(self, X_test):
+        self.new_pred = self.model.predict(X_test)

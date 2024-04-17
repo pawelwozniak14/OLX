@@ -19,9 +19,9 @@ st.markdown("Choose your city")
 
 #st.write("""In this page you can train your own model!""")
 
-@st.cache_data
-def preprocess_data(city_name):
-    response_preprocess = requests.post('http://127.0.0.1:8000/preprocess/', json = city_name)
+#@st.cache_data
+def train_model_from_api(city_name):
+    response_preprocess = requests.post('http://127.0.0.1:8000/train/', json = city_name)
     json_data = response_preprocess.json()["data"]
     rmse = response_preprocess.json()["rmse"]
     mae = response_preprocess.json()["mae"]
@@ -30,6 +30,8 @@ def preprocess_data(city_name):
     else:
         df = ""
     return rmse, mae, df
+
+data = ""
 
 with st.form(key = "train"):
     city = st.selectbox(
@@ -42,7 +44,8 @@ with st.form(key = "train"):
         placeholder="Choose an option",
         index = None)
     city_name = {'city_name': city}
-    rmse, mae, data = preprocess_data(city_name)
+    #st.session_state['city_name'] = city_name
+    rmse, mae, data = train_model_from_api(city_name)
     submit_button = st.form_submit_button("Click here to confirm your choice", type="primary")
 
 

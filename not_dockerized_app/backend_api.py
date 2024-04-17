@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 import my_preprocessing
 import my_training
 import pandas as pd
@@ -7,54 +7,69 @@ import xgboost as xgb
 import uvicorn
 import matplotlib as plt
 import numpy as np
-import jsonpickle.ext.pandas as jsonpickle_pandas
-from jsonpickle.pickler import Pickler
-from jsonpickle.unpickler import Unpickler
-from fastapi.responses import StreamingResponse
-import joblib
-import os
+import io
 
-jsonpickle_pandas.register_handlers()
+
 
 app = FastAPI()
 
+model_xgb = my_training.XGBoostModel()
 
-df = pd.read_csv("data/train4.csv")
+class city:
+    def __init__(self):
+        self.city = ""
+    def set_city(self, city):
+         self.city = city
 
+city_filter = city()
 
 
 @app.get("/")
 async def read_root():
-    return {"message": "Welcome to the model API!"}
-
-@app.post("/hello_world/")
-async def preprocess0(city_name: dict):
-    return city_name
+    return {"message": "Welcome to application's API!"}
 
 
-@app.post("/preprocess/")
-async def preprocess(city_name: dict):
-    if city_name["city_name"]!=None:
-        data = df.loc[df['city_name'] == city_name["city_name"]]
-        data = data.drop("Unnamed: 0", axis=1)
-        data = my_preprocessing.create_dummies(data)
+@app.post("/train/")
+async def train(city_name: dict):
+    if city_name["city_name"] is not None:
+        city_filter.set_city(city_name["city_name"])
+        data = model_xgb.df.loc[model_xgb.df['city_name'] == city_filter.city]
+        data = data.drop(["Unnamed: 0", "city_name"], axis=1)
         X_train, X_val, y_train, y_val = my_preprocessing.data_split(data)
-        model = my_training.train_model(X_train, y_train)
-        rmse, mae, pred = my_training.validate_model(model, X_val, y_val)
-        act_pred = {'actual': y_val, 'pred': pred}
+        model_xgb.train_model(X_train, y_train)
+        model_xgb.validate_model(X_val, y_val)
+        act_pred = {'actual': y_val, 'pred': model_xgb.pred}
         data = pd.DataFrame(act_pred)
-        response = {"rmse": rmse, "mae": mae, "data": data.to_dict(orient="records")}
-        if not os.path.exists("models"):
-            os.makedirs("models")
-        #joblib.dump(model, 'models/xgb_model.pkl')
-        try:
-            joblib.dump(model, 'models/xgb_model.pkl')
-        except Exception as e:
-            print("Error saving the model:", e)
+        response = {"rmse": model_xgb.rmse, "mae": model_xgb.mae, "data": data.to_dict(orient="records")}
         return response
     else:
         response = {"rmse": "", "mae": "", "data": ""}
         return response
+    
+
+
+@app.post("/predict/")
+async def predict(file: UploadFile = File(...)):
+        """
+        data = model_xgb.df.loc[model_xgb.df['city_name'] == "Lublin"]
+        data = data.drop("Unnamed: 0", axis=1)
+        data = my_preprocessing.create_dummies(data)
+        X_train, X_val, y_train, y_val = my_preprocessing.data_split(data)
+        model_xgb.train_model(X_train, y_train)
+        """
+        content = await file.read()
+        df = pd.read_csv(io.BytesIO(content))
+        df = df.loc[df['city_name'] == city_filter.city]
+        df = df.drop(["Unnamed: 0", "city_name"], axis=1)
+        model_xgb.predict_new(df)
+        pred = pd.DataFrame(model_xgb.new_pred, columns = ["pred"])
+        pred["pred"] = pred['pred'].astype(int)
+        #data = pd.concat([df, pred])
+        #data.fillna(value=np.nan, inplace=True)
+        response = {"data": pred.to_dict(orient = "records")}
+        return response
+        
+
     
 
 """
