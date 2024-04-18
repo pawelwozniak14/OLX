@@ -7,7 +7,7 @@ import pandas as pd
 
 class XGBoostModel:
     def __init__(self):
-        self.df = pd.read_csv("data/train7.csv")
+        self.df = pd.read_csv("data/train7.csv") #read train data
 
     def set_df(self, df):
         self.df = df
@@ -16,7 +16,7 @@ class XGBoostModel:
         self.city = city_name
         self.df.loc[self.df['city_name'] == self.city]
 
-    def xgb_cv_score(self, parameters):
+    def xgb_cv_score(self, parameters): #scoring function for the model
         parameters = parameters[0]
         score = -cross_val_score(
             	xgb.XGBRegressor(
@@ -45,7 +45,7 @@ class XGBoostModel:
 	        acquisition_type='EI', max_iter=25
             )
         optimizer.run_optimization()
-        best_params_bayesian = optimizer.x_opt
+        best_params_bayesian = optimizer.x_opt #getting best params
         params_bayesian_opt = {
 	    'max_depth': int(best_params_bayesian[0]),
 	    'min_child_weight': int(best_params_bayesian[1]),
@@ -53,17 +53,17 @@ class XGBoostModel:
 	    'colsample_bytree': best_params_bayesian[3],
 	    'n_estimators': int(best_params_bayesian[4]),
 	    'learning_rate': best_params_bayesian[5]
-        }
+        } #setting a dict of best params
         # Initialize and train the model
-        model_bayesian_opt = xgb.XGBRegressor(**params_bayesian_opt)
-        model_bayesian_opt.fit(self.X_train, self.y_train)
+        model_bayesian_opt = xgb.XGBRegressor(**params_bayesian_opt) 
+        model_bayesian_opt.fit(self.X_train, self.y_train) #training
         self.model = model_bayesian_opt
 
 
     def validate_model(self, X_val, y_val):
-        self.pred = self.model.predict(X_val)
-        self.rmse = mean_squared_error(y_val, self.pred, squared = False)
-        self.mae = mean_absolute_error(y_true = y_val, y_pred = self.pred)
+        self.pred = self.model.predict(X_val) #make predictions on val set
+        self.rmse = mean_squared_error(y_val, self.pred, squared = False) #calculate rmse
+        self.mae = mean_absolute_error(y_true = y_val, y_pred = self.pred) #calculate mae
 
     def predict_new(self, X_test):
-        self.new_pred = self.model.predict(X_test)
+        self.new_pred = self.model.predict(X_test) #make new preds
