@@ -28,6 +28,14 @@ city_filter = city() #init city
 async def read_root():
     return {"message": "Welcome to application's API!"}
 
+@app.post("/get_data/")
+async def get_data(city_name: dict):
+    city_filter.set_city(city_name["city_name"]) #set city to user's choice
+    data = model_xgb.df.loc[model_xgb.df['city_name'] == city_filter.city] #filter dataframe to user's city choice
+    data = data.drop(["Unnamed: 0", "city_name"], axis=1) #drop trash column and city_name
+    response = {"data": data.to_dict(orient="records")}
+    return response
+
 
 @app.post("/train/")
 async def train(city_name: dict):
