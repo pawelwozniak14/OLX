@@ -12,7 +12,9 @@ To run prediction you should use test7.csv. Otherwise you need to put a csv with
 To use prediction you first need to train a model in the training page. Then in the prediction page it will predict prices for the city you previously trained the model on.
 
 ## API methods 
-API has 2 post endpoints.
+API has 3 post endpoints.
+- "/get_data/" where you should send a dictionary with "city_name" key, where value is name of the city of which you want to get data.
+
 - "/train/" where you should send a dictionary with "city_name" key, where value is name of the city you would like to train the model on.
 It returns a dictionary consisting of rmse, mae, data, where rmse is Root Mean Squared Error achieved on validation set, mae is Mean Absolute Error achieved on validation set and data is a dataframe with columns consisting of
 actual and pred, where actual is actual prices of houses in validation set and pred is the predicted value.
@@ -20,6 +22,10 @@ actual and pred, where actual is actual prices of houses in validation set and p
 - "/predict/" where you should send a byte file which is turned into a dataframe used to make predictions for your dataset.
 
 ## Here is how the application looks like:
+- Exploratory Data Analysis:
+![image](https://github.com/pawelwozniak14/OLX/assets/73362296/90af558f-8387-4b41-a78a-ca06ba1c4b45)
+![image](https://github.com/pawelwozniak14/OLX/assets/73362296/94e9511b-6eaf-4297-9684-9465db8d42a6)
+
 - Training:
 ![image](https://github.com/pawelwozniak14/OLX/assets/73362296/88c17f7b-d115-4745-8b3a-3c29e69b45db)
 
