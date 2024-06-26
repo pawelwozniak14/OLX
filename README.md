@@ -29,10 +29,11 @@ actual and pred, where actual is actual prices of houses in validation set and p
 ![image](https://github.com/pawelwozniak14/OLX/assets/73362296/94e9511b-6eaf-4297-9684-9465db8d42a6)
 
 - Training:
-![image](https://github.com/pawelwozniak14/OLX/assets/73362296/88c17f7b-d115-4745-8b3a-3c29e69b45db)
+![image](https://github.com/pawelwozniak14/OLX/assets/73362296/3300776b-79df-4367-bc7d-31ffcc483387)
+
 
 - Prediction:
-![image](https://github.com/pawelwozniak14/OLX/assets/73362296/05f12126-2667-4466-a813-c2186385383c)
+![image](https://github.com/pawelwozniak14/OLX/assets/73362296/87c8d984-7b3b-4c56-affa-8d9e16537d67)
 
 
 
