@@ -23,7 +23,9 @@ actual and pred, where actual is actual prices of houses in validation set and p
 
 ## Here is how the application looks like:
 - Exploratory Data Analysis:
+
 ![image](https://github.com/pawelwozniak14/OLX/assets/73362296/90af558f-8387-4b41-a78a-ca06ba1c4b45)
+
 ![image](https://github.com/pawelwozniak14/OLX/assets/73362296/94e9511b-6eaf-4297-9684-9465db8d42a6)
 
 - Training:
